@@ -1,5 +1,5 @@
 # NCOM
-A secure protocol to remptely execute commands on computers connected over the internet.
+A secure protocol to remotely execute commands on computers connected over the internet.
 ## The name might change in the future!
 
 # Work in progress
