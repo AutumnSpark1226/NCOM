@@ -8,7 +8,6 @@ from Cryptodome.Util import Padding
 
 _server_socket = None
 
-# TODO read config files
 def start(port):
     global _server_socket
     host = socket.gethostname()
@@ -84,6 +83,16 @@ def receive_text(secure_connection, size=1024):
     text = str(Padding.unpad(cipher.decrypt(encrypted_text), 16).decode())
     return text
 
+
+def main():
+   # TODO read config files
+   start(4444)
+   # TODO start thread to handle communication
+   while True:
+      conn, address = accept_client()
+      client_mode = receive_text()
+      # TODO store client metadata (RAM or temp files??)
+      
 
 if __name__ == '__main__':
     # simple echo server to test the communication

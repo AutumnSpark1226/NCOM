@@ -74,6 +74,21 @@ def receive_text(size=1024):
     encrypted_text = _client_socket.recv(size)
     text = str(Padding.unpad(cipher.decrypt(encrypted_text), 16).decode())
     return text
+    
+    
+def send_text_to_other_client(client_data, text):
+    # TODO create header containing metadata
+    send_text(header)
+    # TODO end to end ecryption
+    send_text(encrypted_text)
+    status = receive_text()
+    return status
+    
+def receive_text_from_other_client_or_server()
+    header = receive_text()
+    # TODO extract information
+    text = receive_text()
+    # TODO decrypt text in case it's from another client
 
 
 if __name__ == '__main__':

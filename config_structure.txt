@@ -1,5 +1,22 @@
-~/.config/ncom.conf  json
-
-WIP
+~/.config/ncom/client.conf  json
 
 
+~/.config/ncom/server.conf json
+
+
+~/.config/ncom/client.log
+
+
+~/.config/ncom/server.log
+
+
+~/.config/ncom/keys/  directory
+
+
+~/.config/ncom/keys/$HOSTNAME.pgp  encryption and login pgp key
+
+
+~/.config/ncom/my_certificate.cert  own certificate
+
+
+~/.config/ncom/trusted_certificates  trusted certificates from server/other clients
