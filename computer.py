@@ -10,7 +10,7 @@ def main():
             cmd_output = 'command output not sent'
         # TODO send cmd_output
     # TODO disconnect
-    
-    
+
+
 if __name__ == '__main__':
-   main()
+    main()
