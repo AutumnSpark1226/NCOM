@@ -1,3 +1,5 @@
+This document contains my thoughts about the configuration structure.
+
 ~/.config/ncom/client.conf  json
 
 

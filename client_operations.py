@@ -77,9 +77,11 @@ def receive_text(size=1024):
 
 
 def send_text_to_other_client(client_data, text):
+    header = client_data
     # TODO create header containing metadata
     send_text(header)
-    # TODO end to end ecryption
+    # TODO end to end encryption
+    encrypted_text = text
     send_text(encrypted_text)
     status = receive_text()
     return status
@@ -91,16 +93,3 @@ def receive_text_from_other_client_or_server():
     text = receive_text()
     # TODO decrypt text in case it's from another client
 
-
-if __name__ == '__main__':
-    # simple echo client to test the communication
-    host = socket.gethostname()
-    connect(host, 4444)
-    while True:
-        test_message = input("> ")
-        send_text(test_message)
-        if test_message == 'disconnect':
-            break
-        test_message = receive_text()
-        print('received: ' + test_message)
-    disconnect()

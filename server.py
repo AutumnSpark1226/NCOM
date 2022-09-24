@@ -96,14 +96,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # simple echo server to test the communication
-    start(4444)
-    conn, address = accept_client()
-    while True:
-        test_message = receive_text(conn)
-        if test_message == 'disconnect':
-            break
-        print("received: " + test_message)
-        send_text(conn, test_message)
-    conn[0].close()
-    stop()
+    main()

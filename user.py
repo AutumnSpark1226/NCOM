@@ -1,3 +1,7 @@
+# config
+print_cmd_output = True
+
+
 def main():
     # TODO read configuration
     server_adress = input("server ip: ")
@@ -14,10 +18,14 @@ def main():
 
 
 def execute_command(command):
-   # TODO WIP
+    return "not supported"
+    # TODO WIP
 
-def log():
-   # TODO simple logging utility
+
+def log(text):
+    print("[log] " + text)
+    # TODO better logging
+
 
 if __name__ == "__main__":
     main()
