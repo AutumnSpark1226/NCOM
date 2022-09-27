@@ -1,5 +1,5 @@
-import hashlib
 import socket
+import sys
 
 import Cryptodome.Cipher.PKCS1_OAEP  # pip install pycryptodomex
 from Cryptodome.Cipher import AES
@@ -7,6 +7,9 @@ from Cryptodome.PublicKey import RSA
 from Cryptodome.Util import Padding
 
 _server_socket = None
+
+# config
+_hashed_password = "A"
 
 
 def start(port):
@@ -18,9 +21,11 @@ def start(port):
 
 
 def stop():
+    global _server_socket
     if not _server_socket:
         raise Exception("server not running")
     _server_socket.close()
+    _server_socket = None
 
 
 def accept_client():
@@ -28,43 +33,40 @@ def accept_client():
         raise Exception("server not running")
     connection, client_address = _server_socket.accept()
     # generate rsa key
-    key = RSA.generate(2048)
+    key = RSA.generate(4096)
     # save private_key
     private_key = key.exportKey('PEM')
     rsa_private_key = RSA.importKey(private_key)
     oaep_cipher = Cryptodome.Cipher.PKCS1_OAEP.new(rsa_private_key)
     # save public_key
     public_key = key.publickey().exportKey('PEM')
-    # hash public key
-    hashed_public_key = hashlib.sha512(public_key).hexdigest().encode()
     # send public_key
     connection.send(public_key)
     # receive encrypted aes_key
-    rsa_encrypted = connection.recv(1024)
+    encrypted_aes_key = connection.recv(1024)
     # decrypt aes_key
-    aes_key = oaep_cipher.decrypt(rsa_encrypted)
+    aes_key = oaep_cipher.decrypt(encrypted_aes_key)
     # receive iv
-    rsa_encrypted = connection.recv(1024)
+    encrypted_iv = connection.recv(1024)
     # decrypt iv
-    iv = oaep_cipher.decrypt(rsa_encrypted)
-    # create cipher
-    cipher = AES.new(aes_key, AES.MODE_CBC, iv)
-    # encrypt hashed_public_key
-    encrypted_hashed_public_key = cipher.encrypt(hashed_public_key)
-    # send encrypted_hashed_public_key
-    connection.send(encrypted_hashed_public_key)
-    # receive encrypted_hashed_public_key2
-    encrypted_hashed_public_key2 = connection.recv(1024)
-    # decrypt hashed_public_key2
-    cipher = AES.new(aes_key, AES.MODE_CBC, iv)
-    hashed_public_key2 = cipher.decrypt(encrypted_hashed_public_key2).decode()
-    # check if hashed_public_key and hashed_public_key2 are equal (they should be)
-    if hashed_public_key2 == hashed_public_key.decode():
+    iv = oaep_cipher.decrypt(encrypted_iv)
+    # create secure_connection
+    secure_connection = tuple((connection, aes_key, iv))
+    # send text to check encryption
+    send_text(secure_connection, "encryptionOk")
+    # receive hashed_client_password
+    hashed_client_password = receive_text(secure_connection)
+    # check if hashed_client_password and _hashed_password are equal
+    if hashed_client_password == _hashed_password:
+        send_text(secure_connection, "passwordOK")
+        print("password ok")
+        # TODO key and certificate check / generation
         secure_connection = tuple((connection, aes_key, iv))
-        return secure_connection, client_address
+        client_metadata = "WIP"
+        return secure_connection, client_address, client_metadata
     else:
         connection.close()
-        raise Exception("encryption or client error")
+        raise Exception("password error")
 
 
 def send_text(secure_connection, text):
@@ -90,9 +92,8 @@ def main():
     start(4444)
     # TODO start thread to handle communication
     while True:
-        conn, address = accept_client()
-        client_mode = receive_text()
-        # TODO store client metadata (RAM or temp files??)
+        conn, address, client_metadata = accept_client()
+        # TODO store client metadata
 
 
 if __name__ == '__main__':

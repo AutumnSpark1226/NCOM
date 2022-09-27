@@ -1,6 +1,6 @@
-import hashlib
 import os
 import socket
+import sys
 
 from Cryptodome.Cipher import AES  # pip install pycryptodomex
 from Cryptodome.Cipher import PKCS1_OAEP
@@ -12,7 +12,7 @@ _aes_key = None
 _iv = None
 
 
-def connect(host, port):
+def connect(host, port, hashed_password):
     global _client_socket
     _client_socket = socket.socket()
     _client_socket.connect((host, port))
@@ -35,21 +35,18 @@ def connect(host, port):
     encrypted_iv = oaep_cipher.encrypt(_iv)
     # send encrypted_iv
     _client_socket.send(encrypted_iv)
-    # receive encrypted_hashed_public_key
-    encrypted_hashed_public_key = _client_socket.recv(1024)
-    # decrypt hashed_public_key
-    hashed_public_key = cipher.decrypt(encrypted_hashed_public_key).decode()
-    # hash public key
-    hashed_public_key2 = hashlib.sha512(public_key).hexdigest().encode()
-    # encrypt hashed_public_key2
-    cipher = AES.new(_aes_key, AES.MODE_CBC, _iv)
-    encrypted_hashed_public_key2 = cipher.encrypt(hashed_public_key2)
-    # send encrypted_hashed_public_key2
-    _client_socket.send(encrypted_hashed_public_key2)
-    # check if hashed_public_key and hashed_public_key2 are equal (they should be)
-    if hashed_public_key2.decode() != hashed_public_key:
-        _client_socket.close()
-        raise Exception("encryption or server error")
+    # check encryption
+    if not receive_text() == "encryptionOk":
+        disconnect()
+        raise Exception("encryption error")
+    # send password
+    send_text(hashed_password)
+    # wait for server password check
+    password_check_response = receive_text()
+    if not password_check_response == "passwordOK":
+        disconnect()
+        raise Exception("wrong password")
+    print("password ok")
 
 
 def disconnect():
@@ -87,9 +84,14 @@ def send_text_to_other_client(client_data, text):
     return status
 
 
-def receive_text_from_other_client_or_server():
+def receive_text_from_server_or_other_client():
     header = receive_text()
     # TODO extract information
     text = receive_text()
     # TODO decrypt text in case it's from another client
 
+
+if __name__ == "__main__":
+    connect("bestPCEver", 4444, "A")
+
+# hash: hashed = hashlib.sha512(value).hexdigest().encode()
