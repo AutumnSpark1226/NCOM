@@ -43,13 +43,19 @@ def accept_client():
     # send public_key
     connection.send(public_key)
     # receive encrypted aes_key
-    encrypted_aes_key = connection.recv(1024)
+    encrypted_aes_key = connection.recv(545)
     # decrypt aes_key
     aes_key = oaep_cipher.decrypt(encrypted_aes_key)
+    if sys.getsizeof(aes_key) != 65:  # this value equals the size of the key after generation
+        connection.close()
+        raise Exception("encryption error")
     # receive iv
-    encrypted_iv = connection.recv(1024)
+    encrypted_iv = connection.recv(545)
     # decrypt iv
     iv = oaep_cipher.decrypt(encrypted_iv)
+    if sys.getsizeof(iv) != 49:  # this value equals the size of the key after generation
+        connection.close()
+        raise Exception("encryption error")
     # create secure_connection
     secure_connection = tuple((connection, aes_key, iv))
     # send text to check encryption
@@ -61,7 +67,6 @@ def accept_client():
         send_text(secure_connection, "passwordOK")
         print("password ok")
         # TODO key and certificate check / generation
-        secure_connection = tuple((connection, aes_key, iv))
         client_metadata = "WIP"
         return secure_connection, client_address, client_metadata
     else:

@@ -17,14 +17,15 @@ def connect(host, port, hashed_password):
     _client_socket = socket.socket()
     _client_socket.connect((host, port))
     # receive public_key
-    public_key = _client_socket.recv(1024)
+    public_key = _client_socket.recv(832)
+    if sys.getsizeof(public_key) != 832:  # this value equals the size of the key after generation
+        _client_socket.close()
+        raise Exception("encryption error")
     # generate _aes_key
     global _aes_key, _iv
     _aes_key = os.urandom(32)
     # generate _iv
     _iv = os.urandom(16)
-    # create cipher
-    cipher = AES.new(_aes_key, AES.MODE_CBC, _iv)
     # encrypt aes_key
     rsa_public_key = RSA.importKey(public_key)
     oaep_cipher = PKCS1_OAEP.new(rsa_public_key)
@@ -47,6 +48,8 @@ def connect(host, port, hashed_password):
         disconnect()
         raise Exception("wrong password")
     print("password ok")
+    # TODO certificate check / generation
+    # TODO send metadata
 
 
 def disconnect():
