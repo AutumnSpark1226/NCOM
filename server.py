@@ -6,17 +6,17 @@ from Cryptodome.Cipher import AES
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Util import Padding
 
-_server_socket = None
+_server_socket: socket.socket
 
 # config
 _hashed_password = "A"
 
 
 def start(port):
+    # TODO read configuration
     global _server_socket
-    host = socket.gethostname()
     _server_socket = socket.socket()
-    _server_socket.bind((host, port))
+    _server_socket.bind(("0.0.0.0", port))
     _server_socket.listen()
 
 
@@ -94,10 +94,12 @@ def receive_text(secure_connection, size=1024):
 
 def main():
     # TODO read config files
-    start(4444)
+    start(44444)
     # TODO start thread to handle communication
     while True:
         conn, address, client_metadata = accept_client()
+        send_text(conn, "Hi")
+        print(receive_text(conn))
         # TODO store client metadata
 
 

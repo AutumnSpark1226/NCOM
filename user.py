@@ -1,11 +1,15 @@
 # config
+import client_operations
+
 print_cmd_output = True
 
 
 def main():
     # TODO read configuration
-    server_adress = input("server ip: ")
-    # TODO connect and authenticate
+    server_address = input("server ip: ")
+    client_operations.connect("bestPCEver", 44444, "A")
+    print(client_operations.receive_text())
+    client_operations.send_text("Hi2")
     while True:
         command = input("> ")
         if command == "exit" or command == "quit":
@@ -14,7 +18,7 @@ def main():
         if print_cmd_output:
             print(output)
         log(output)
-    # TODO disconnect
+    client_operations.disconnect()
 
 
 def execute_command(command):

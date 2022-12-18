@@ -7,9 +7,9 @@ from Cryptodome.Cipher import PKCS1_OAEP
 from Cryptodome.PublicKey import RSA
 from Cryptodome.Util import Padding
 
-_client_socket = None
-_aes_key = None
-_iv = None
+_client_socket: socket.socket
+_aes_key: bytes
+_iv: bytes
 
 
 def connect(host, port, hashed_password):
@@ -55,6 +55,7 @@ def connect(host, port, hashed_password):
 def disconnect():
     if not _client_socket:
         raise Exception("client not connected")
+    send_text("clientDisconnect")
     _client_socket.close()
 
 
@@ -87,14 +88,8 @@ def send_text_to_other_client(client_data, text):
     return status
 
 
-def receive_text_from_server_or_other_client():
+def receive_text_from_server_or_other_client():  # great name XD
     header = receive_text()
     # TODO extract information
     text = receive_text()
     # TODO decrypt text in case it's from another client
-
-
-if __name__ == "__main__":
-    connect("bestPCEver", 4444, "A")
-
-# hash: hashed = hashlib.sha512(value).hexdigest().encode()
