@@ -1,4 +1,6 @@
 # config
+from getpass import getpass
+
 import client_operations
 
 print_cmd_output = True
@@ -6,8 +8,20 @@ print_cmd_output = True
 
 def main():
     # TODO read configuration
-    server_address = input("server ip: ")
-    client_operations.connect("bestPCEver", 44444, "A")
+    server_address = input("server address: ")  # TODO url parsing
+    # split host and port
+    if server_address.__contains__("]") and server_address.__contains__(":") and \
+            server_address.rfind(":") > server_address.rfind("]"):
+        host = server_address[:server_address.rfind(":")]
+        port = int(server_address[(server_address.rfind(":") + 1):])
+    elif server_address.__contains__(":") and server_address.rfind(":") > server_address.rfind("]"):
+        host = server_address[:server_address.rfind(":")]
+        port = int(server_address[(server_address.rfind(":") + 1):])
+    else:
+        host = server_address
+        port = 44444
+    password = getpass("Password: ")
+    client_operations.connect(host, port, password)
     print(client_operations.receive_text())
     client_operations.send_text("Hi2")
     while True:

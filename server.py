@@ -16,7 +16,7 @@ def start(port):
     # TODO read configuration
     global _server_socket
     _server_socket = socket.socket()
-    _server_socket.bind(("0.0.0.0", port))
+    _server_socket.bind(("0.0.0.0", port))  # TODO bind to other address?
     _server_socket.listen()
 
 
