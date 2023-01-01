@@ -34,11 +34,11 @@ def accept_client():
     connection, client_address = _server_socket.accept()
     # generate rsa key
     key = RSA.generate(4096)
-    # save private_key
+    # create cipher
     private_key = key.exportKey('PEM')
     rsa_private_key = RSA.importKey(private_key)
     oaep_cipher = Cryptodome.Cipher.PKCS1_OAEP.new(rsa_private_key)
-    # save public_key
+    # export public_key
     public_key = key.publickey().exportKey('PEM')
     # send public_key
     connection.send(public_key)
@@ -67,6 +67,7 @@ def accept_client():
         send_text(secure_connection, "passwordOK")
         print("password ok")
         # TODO key and certificate check / generation
+        # receive client metadata TODO WIP
         client_metadata = "WIP"
         return secure_connection, client_address, client_metadata
     else:
